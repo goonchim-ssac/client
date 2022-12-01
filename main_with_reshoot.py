@@ -2,10 +2,10 @@ import streamlit as st
 from webcam import webcam
 import pyautogui
 import requests
-from post_processing import text_postprocessing
-from func import ImageFile
-import pyautogui
+
 from config import DB_SERVER_URL
+from func import ImageFile
+from post_processing import get_expdate
 
 
 # 기본 설정
@@ -31,47 +31,47 @@ if option == "입고처리":
         
         image_file = ImageFile()
 
-        if check_cam == 'Maincam': # 내장 캠인 경우
+        if check_cam == 'Maincam': # 내장 캠
             captured_image = st.camera_input("카메라")
             
             if captured_image is None:
                 st.write("Waiting for capture...")
             else:
                 st.image(captured_image)
+                buffered_stream = image_file.image_to_buffer(captured_image)
+                upload = {'file': buffered_stream}
 
-                if st.session_state.last != None: # 이전에 촬영된 이미지가 있는 경우
-                    buffered_stream = image_file.image_to_buffer(st.session_state.last)
-                    upload = {'file': buffered_stream}
-                    # print(f"촬영된 이미지 정보는 {captured_image} 입니다.")
-                    # print(f"이전에 촬영된 이미지 정보인 {st.session_state.last}가 전송됩니다.")
-                    res = requests.post(url=DB_SERVER_URL, files=upload)
-                    image_file.drop_image(buffered_stream)
+                inference = requests.post(url="http://127.0.0.1:8000/exp_date", files=upload) # 추론
+                print(inference.text)
 
-                st.session_state.last = captured_image
+                if st.session_state.last != None: # 재촬영
+                    res = requests.post(url=DB_SERVER_URL, files=upload) # 재학습용 DB서버로 전송
+                    print(res, "DB 서버로 전송되었습니다.")
                 
-        else: # 외장 캠인 경우
+                image_file.drop_image(buffered_stream)
+                st.session_state.last = buffered_stream
+                
+        else: # 외장 캠
             captured_image = webcam("카메라")
             
             if captured_image is None:
                 st.write("Waiting for capture...")
             else:
-                st.session_state.count += 1
                 st.image(captured_image)
+                buffered_stream = image_file.image_to_buffer(captured_image)
+                upload = {'file': buffered_stream}
 
-                # 재촬영
-                if st.session_state.last != None: # 이전에 촬영된 이미지가 있는 경우
-                    buffered_stream = image_file.image_to_buffer(st.session_state.last)
-                    upload = {'file': buffered_stream}
-                    # print(f"촬영된 이미지 정보는 {captured_image} 입니다.")
-                    # print(f"이전에 촬영된 이미지 정보인 {st.session_state.last}가 전송됩니다.")
-                    res = requests.post(url=DB_SERVER_URL, files=upload)
-                    image_file.drop_image(buffered_stream)
-                
-                st.session_state.last = captured_image
+                inference = requests.post(url="http://127.0.0.1:8000/exp_date", files=upload) # 추론
+                print(inference.text)
 
-        # result = text_postprocessing(res)
-        # print(result)
+                if st.session_state.last != None: # 재촬영
+                    res = requests.post(url=DB_SERVER_URL, files=upload) # 재학습용 DB 서버로 전송
+                    print(res, "DB 서버로 전송되었습니다.")
 
+                image_file.drop_image(buffered_stream)
+                st.session_state.last = buffered_stream
+
+        # expdate = get_expdate() # ocr_list
 
     if st.button('등록'):
         pyautogui.press("f5", presses=1, interval=0.2)
