@@ -10,11 +10,12 @@ class ImageFile():
     def __init__(self):
         pass
 
+
     def make_filepath(self):
         self.time = str(datetime.now(timezone("Asia/Seoul")))
         self.time = re.sub(r'[.|:]', '', self.time) # 파일명에 사용할 수 없는 문자열 제거
         
-        return f'Client/{self.time}.jpg'
+        return f'{self.time}.jpg'
 
 
     def image_to_buffer(self, img): # img에 captured_image
