@@ -11,7 +11,6 @@ def check_date(year, month, day):
     thisyear = date.today().year - 2000
 
     # +/-10년 사이인 유통기한만 처리
-
     start_year = thisyear - 10
     end_year = thisyear + 10
 
@@ -40,18 +39,17 @@ def check_date(year, month, day):
 
     return 0
 
+
 # OCR병합, 숫자만 남김
 def change_num(ocr_list):
-    
     ocr_word = ''.join(ocr_list)
     date_n = re.sub(r'[^0-9]', '', ocr_word)
 
     return date_n
 
 
-
 # 유통기한(yyyy/mm/dd) 형식으로 변경
-def change_ex(ocr_list): #date_n
+def get_expdate(ocr_list): #date_n
     date_n = change_num(ocr_list)
     size = len(date_n)
     exdate = []
@@ -65,7 +63,6 @@ def change_ex(ocr_list): #date_n
 
     # 4자리 : 유제품류 mm dd
     elif size == 4:
-    
         month = date_n[0:2]
         day = date_n[2:4]
         today = date.today()
@@ -78,7 +75,6 @@ def change_ex(ocr_list): #date_n
 
     # 6자리 : yy mm dd / mm dd yy
     elif size == 6:
-    
         if date_n[0] == '2':
             year = date_n[0:2]
             month = date_n[2:4]
@@ -92,12 +88,10 @@ def change_ex(ocr_list): #date_n
         result = check_date(year, month, day)
         
         if result == 1:
-            exdate.append(f'20{year}/{month}/{day}')
-            
+            exdate.append(f'20{year}/{month}/{day}') 
                 
     # 8자리 : (yy)yy mm dd / mm dd (yy)yy
     elif size == 8:
-        
         if date_n[0] == '2': 
             year = date_n[2:4]
             month = date_n[4:6]
@@ -120,11 +114,5 @@ def change_ex(ocr_list): #date_n
     return exdate
 
 
-def text_postprocessing():
-    '''
-    수정한 후처리 코드로 변경 필요
-    '''
-    pass
-
 if __name__ == "__main__":
-    print(change_ex(['22','10.10']))
+    print(get_expdate(['22','10.10']))

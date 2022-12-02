@@ -22,6 +22,8 @@ def get_secret(
 
 
 DB_SERVER_URL = get_secret("DB_SERVER_URL")
+STOCK = get_secret("STOCK")
+INFERENCE_SERVER_URL = get_secret("INFERENCE_SERVER_URL")
 
 
 if __name__ == "__main__":
