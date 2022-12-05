@@ -2,9 +2,8 @@ from datetime import datetime
 import streamlit as st
 import requests
 import pandas as pd
-import json
 
-url = "http://127.0.0.1:8000/stock/"
+url = "http://52.78.154.186:9000/stock/"
 
 st.title('🔍 입고조회')
 
