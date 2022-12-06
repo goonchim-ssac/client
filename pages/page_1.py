@@ -8,10 +8,12 @@ from datetime import datetime
 import requests
 import re
 import pyautogui
+import qrcode
 
 from component.config import DB_SERVER_URL, INFERENCE_SERVER_URL, STOCK
 from component.func import ImageFile
 from component.post_processing import get_expdate
+
 
 
 # 기본 설정
@@ -168,25 +170,32 @@ if len(barcode) == 13:
             # 확인
             if check_info == '확인':
                 count = st.number_input('수량을 입력해주세요', 0, 1000)
+                
+                if st.button('QR 생성'):
+                    exp_date_num = exp_date.replace("/","")
+                    img = qrcode.make(f"{barcode}{exp_date_num}")
+                    img.save(f"./pages/qr_code/{barcode}{exp_date_num}.jpg")
+                    st.image("./pages/qr_code/{barcode}{exp_date_num}.jpg")
 
-                if st.button('등록'):
-                    ls_dt = datetime.now()
-                    ls_dt = ls_dt.strftime('%Y/%m/%d')
 
-                    ls_cd = datetime.today().strftime("%Y%m%d%H%M%S%f")
+                    if st.button('등록'):
+                        ls_dt = datetime.now()
+                        ls_dt = ls_dt.strftime('%Y/%m/%d')
 
-                    data = {
-                        'ls_cd': ls_cd,
-                        'ls_dt': ls_dt,
-                        'barcode': barcode,
-                        'ex_dt': exp_date,
-                        'ls_ct': count
-                        }
+                        ls_cd = datetime.today().strftime("%Y%m%d%H%M%S%f")
 
-                    res = requests.post(url=STOCK, json=data)
-                    print("입고 DB 전송 결과 :", res, res.text)
-                    st.success(f' < 바코드번호 : {barcode} / {count} 개 > 등록되었습니다 ')
-                    pyautogui.press("f5", presses=1, interval=0.2)
+                        data = {
+                            'ls_cd': ls_cd,
+                            'ls_dt': ls_dt,
+                            'barcode': barcode,
+                            'ex_dt': exp_date,
+                            'ls_ct': count
+                            }
+
+                        res = requests.post(url=STOCK, json=data)
+                        print("입고 DB 전송 결과 :", res, res.text)
+                        st.success(f' < 바코드번호 : {barcode} / {count} 개 > 등록되었습니다 ')
+                        pyautogui.press("f5", presses=1, interval=0.2)
 
             # 직접 입력
             else :
@@ -195,25 +204,31 @@ if len(barcode) == 13:
                     exp_date = st.date_input('유통기한을 입력해주세요.')
                 with co2 :
                     count = st.number_input('수량을 입력해주세요', 0, 1000)
+                    
+                    if st.button('QR 생성'):
+                        exp_date_num = exp_date.replace("/","")
+                        img = qrcode.make(f"{barcode}{exp_date_num}")
+                        img.save(f"./pages/qr_code/{barcode}{exp_date_num}.jpg")
+                        st.image("./pages/qr_code/{barcode}{exp_date_num}.jpg")
 
-                if st.button('등록'):
-                    ls_dt = datetime.now()
-                    ls_dt = ls_dt.strftime('%Y/%m/%d')
+                        if st.button('등록'):
+                            ls_dt = datetime.now()
+                            ls_dt = ls_dt.strftime('%Y/%m/%d')
 
-                    ls_cd = datetime.today().strftime("%Y%m%d%H%M%S%f")
+                            ls_cd = datetime.today().strftime("%Y%m%d%H%M%S%f")
 
-                    data = {
-                        'ls_cd': ls_cd,
-                        'ls_dt': ls_dt,
-                        'barcode': barcode,
-                        'ex_dt': str(exp_date),
-                        'ls_ct': count
-                        }
+                            data = {
+                                'ls_cd': ls_cd,
+                                'ls_dt': ls_dt,
+                                'barcode': barcode,
+                                'ex_dt': str(exp_date),
+                                'ls_ct': count
+                                }
 
-                    res = requests.post(url=STOCK, json=data)
-                    print("입고 DB 전송 결과 :", res, res.text)
-                    st.success(f' < 바코드번호 : {barcode} / {count} 개 > 등록되었습니다 ')
-                    pyautogui.press("f5", presses=1, interval=0.2)
+                            res = requests.post(url=STOCK, json=data)
+                            print("입고 DB 전송 결과 :", res, res.text)
+                            st.success(f' < 바코드번호 : {barcode} / {count} 개 > 등록되었습니다 ')
+                            pyautogui.press("f5", presses=1, interval=0.2)
 
 else:
     st.error('바코드를 다시 입력해주세요.')
