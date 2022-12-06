@@ -49,7 +49,7 @@ if len(barcode) == 13:
             upload = {'file': buffered_stream}
 
             # 추론
-            inference = requests.post(url="http://127.0.0.1:8000/exp_date", files=upload)
+            inference = requests.post(url=INFERENCE_SERVER_URL, files=upload)
             exp_date = get_expdate(inference.json()["exp_date"])
             print("추론 결과 :", inference, inference.text)
 
@@ -141,7 +141,7 @@ if len(barcode) == 13:
             upload = {'file': buffered_stream}
 
             # 추론
-            inference = requests.post(url="http://127.0.0.1:8000/exp_date", files=upload)
+            inference = requests.post(url=INFERENCE_SERVER_URL, files=upload)
             exp_date = get_expdate(inference.json()["exp_date"])
             print("추론 결과 :", inference, inference.text)
 
