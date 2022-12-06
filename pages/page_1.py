@@ -7,6 +7,7 @@ from webcam import webcam
 from datetime import datetime
 import requests
 import re
+import pyautogui
 
 from component.config import DB_SERVER_URL, INFERENCE_SERVER_URL, STOCK
 from component.func import ImageFile
@@ -48,12 +49,12 @@ if len(barcode) == 13:
             # 추론
             inference = requests.post(url="http://127.0.0.1:8000/exp_date", files=upload)
             exp_date = get_expdate(inference.json()["exp_date"])
+            print("추론 결과 :", inference, inference.text)
 
             # 화면에 표시할 정보
             st.write(f'< 바코드번호 : {barcode}>')
-            st.write('상품정보 : 사람')
+            st.write('상품정보 : 식품')
             st.write(f'유통기한 : {exp_date}')
-            st.write('삐-빅 정상입니다')
             st.write('-------')
 
             # 재촬영인 경우 재학습용 DB 서버로 보냄
@@ -61,9 +62,13 @@ if len(barcode) == 13:
                 buffered_stream = image_file.image_to_buffer(captured_image)
                 upload = {'file': buffered_stream}
                 res = requests.post(url=DB_SERVER_URL, files=upload)
-                print("재촬영 이미지 DB 전송 결과 :", res)
-            st.session_state.last = buffered_stream # 다음 촬영 시 보내기 위해 저장
-            image_file.drop_image(buffered_stream) # 이미지 파일 삭제
+                print("재촬영 이미지 전송 결과 :", res, res.text)
+
+                st.session_state.last = buffered_stream # 다음 촬영 시 보내기 위해 저장
+                image_file.drop_image(buffered_stream) # 이미지 파일 삭제
+            
+            else:
+                st.session_state.last = buffered_stream
             
 
             # 예측된 유통기한을 그대로 사용할지(확인), 수정하여 사용할지(직접입력) 선택
@@ -72,33 +77,54 @@ if len(barcode) == 13:
             # 확인
             if check_info == '확인':
                 count = st.number_input('수량을 입력해주세요.', 0, 1000)
-                st.button("등록", on_click = button_clicked)
-                if st.session_state.button_clicked:
-                    st.success(f' < 바코드번호 : {barcode} / {count} 개 > 등록되었습니다.')
+
+                if st.button('등록'):
+                    ls_dt = datetime.now()
+                    ls_dt = ls_dt.strftime('%Y/%m/%d')
+
+                    ls_cd = datetime.today().strftime("%Y%m%d%H%M%S%f")
+
+                    data = {
+                        'ls_cd': ls_cd,
+                        'ls_dt': ls_dt,
+                        'barcode': barcode,
+                        'ex_dt': exp_date,
+                        'ls_ct': count
+                        }
+
+                    res = requests.post(url=STOCK, json=data)
+                    print("입고 DB 전송 결과 :", res, res.text)
+                    st.success(f' < 바코드번호 : {barcode} / {count} 개 > 등록되었습니다 ')
+                    pyautogui.press("f5", presses=1, interval=0.2)
             
             # 직접 입력
             else :
                 ex1, co2 = st.columns(2)
                 with ex1 :
-                    exdate = st.date_input('유통기한을 입력해주세요.')
+                    exp_date = st.date_input('유통기한을 입력해주세요.')
+                    exp_date = str(exp_date).replace('-', '/')
                 with co2 :
                     count = st.number_input('수량을 입력해주세요', 0, 1000)
-                st.button("등록", on_click = button_clicked)
-                        
-                if st.session_state.button_clicked:
+
+                if st.button('등록'):
+                    ls_dt = datetime.now()
+                    ls_dt = ls_dt.strftime('%Y/%m/%d')
+
+                    ls_cd = datetime.today().strftime("%Y%m%d%H%M%S%f")
+
+                    data = {
+                        'ls_cd': ls_cd,
+                        'ls_dt': ls_dt,
+                        'barcode': barcode,
+                        'ex_dt': str(exp_date),
+                        'ls_ct': count
+                        }
+                    print(data)
+
+                    res = requests.post(url=STOCK, json=data)
+                    print("입고 DB 전송 결과 :", res, res.text)
                     st.success(f' < 바코드번호 : {barcode} / {count} 개 > 등록되었습니다 ')
-            
-
-            ls_dt = str(datetime.today())
-            ls_dt = re.sub('[.|:]', '', ls_dt)
-
-            data = {
-                'ls_dt': ls_dt,
-                'barcode': barcode,
-                'ex_dt': exp_date,
-                'ls_ct': count
-                }
-            res = requests.post(url=STOCK, data=data)
+                    pyautogui.press("f5", presses=1, interval=0.2)
 
     # 외장 캠인 경우           
     else:
@@ -114,14 +140,13 @@ if len(barcode) == 13:
 
             # 추론
             inference = requests.post(url="http://127.0.0.1:8000/exp_date", files=upload)
-            print(inference.text)
             exp_date = get_expdate(inference.json()["exp_date"])
+            print("추론 결과 :", inference, inference.text)
 
             # 화면에 표시할 정보
             st.write(f'< 바코드번호 : {barcode}>')
-            st.write('상품정보 : 사람')
+            st.write('상품정보 : 식품')
             st.write(f'유통기한 : {exp_date}')
-            st.write('삐-빅 정상입니다')
             st.write('-------')
 
             # 재촬영인 경우 재학습용 DB 서버로 보냄
@@ -129,11 +154,13 @@ if len(barcode) == 13:
                 buffered_stream = image_file.image_to_buffer(captured_image)
                 upload = {'file': buffered_stream}
                 res = requests.post(url=DB_SERVER_URL, files=upload)
-                print("재촬영 이미지 DB 전송 결과 :", res)
+                print("재촬영 이미지 전송 결과 :", res, res.text)
             
-            st.session_state.last = buffered_stream # 다음 촬영 시 보내기 위해 저장
-            image_file.drop_image(buffered_stream) # 이미지 파일 삭제
-
+                st.session_state.last = buffered_stream # 다음 촬영 시 보내기 위해 저장
+                image_file.drop_image(buffered_stream) # 이미지 파일 삭제
+            
+            else:
+                st.session_state.last = buffered_stream
 
             # 예측된 유통기한을 그대로 사용할지(확인), 수정하여 사용할지(직접입력) 선택
             check_info = st.radio(label = '유통기한 정보를 확인해주세요', options = ['확인', '직접입력'])
@@ -141,37 +168,52 @@ if len(barcode) == 13:
             # 확인
             if check_info == '확인':
                 count = st.number_input('수량을 입력해주세요', 0, 1000)
-                st.button("등록", on_click = button_clicked)
-                        
-                if st.session_state.button_clicked:
+
+                if st.button('등록'):
+                    ls_dt = datetime.now()
+                    ls_dt = ls_dt.strftime('%Y/%m/%d')
+
+                    ls_cd = datetime.today().strftime("%Y%m%d%H%M%S%f")
+
+                    data = {
+                        'ls_cd': ls_cd,
+                        'ls_dt': ls_dt,
+                        'barcode': barcode,
+                        'ex_dt': exp_date,
+                        'ls_ct': count
+                        }
+
+                    res = requests.post(url=STOCK, json=data)
+                    print("입고 DB 전송 결과 :", res, res.text)
                     st.success(f' < 바코드번호 : {barcode} / {count} 개 > 등록되었습니다 ')
-                    
+                    pyautogui.press("f5", presses=1, interval=0.2)
+
             # 직접 입력
             else :
                 ex1, co2 = st.columns(2)
                 with ex1 :
-                    exdate = st.date_input('유통기한을 입력해주세요.')
+                    exp_date = st.date_input('유통기한을 입력해주세요.')
                 with co2 :
                     count = st.number_input('수량을 입력해주세요', 0, 1000)
-                st.button("등록", on_click = button_clicked)
-                        
-                if st.session_state.button_clicked:
+
+                if st.button('등록'):
+                    ls_dt = datetime.now()
+                    ls_dt = ls_dt.strftime('%Y/%m/%d')
+
+                    ls_cd = datetime.today().strftime("%Y%m%d%H%M%S%f")
+
+                    data = {
+                        'ls_cd': ls_cd,
+                        'ls_dt': ls_dt,
+                        'barcode': barcode,
+                        'ex_dt': str(exp_date),
+                        'ls_ct': count
+                        }
+
+                    res = requests.post(url=STOCK, json=data)
+                    print("입고 DB 전송 결과 :", res, res.text)
                     st.success(f' < 바코드번호 : {barcode} / {count} 개 > 등록되었습니다 ')
-                    
-
-            ls_dt = str(datetime.today())
-            ls_dt = re.sub('[.|:]', '', ls_dt)
-
-            data = {
-                'ls_dt': ls_dt,
-                'barcode': barcode,
-                'ex_dt': exp_date,
-                'ls_ct': count
-                }
-    
-            res = requests.post(url=STOCK, data=data)
-            print("입고 DB 전송 결과 :", res)
-
+                    pyautogui.press("f5", presses=1, interval=0.2)
 
 else:
     st.error('바코드를 다시 입력해주세요.')
