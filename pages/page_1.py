@@ -47,6 +47,7 @@ if len(barcode) == 13:
         else:
             buffered_stream = image_file.image_to_buffer(captured_image)
             upload = {'file': buffered_stream}
+            print(upload)
 
             # 추론
             inference = requests.post(url=INFERENCE_SERVER_URL, files=upload)
