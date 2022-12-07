@@ -1,9 +1,13 @@
+import sys
 import streamlit as st
 import requests
-from datetime import datetime, timedelta
 import pandas as pd
+from pathlib import Path
+from datetime import datetime, timedelta
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+from component.config import AP_SERVER_URL 
 
-URL = "http://127.0.0.1:8000/ex_date/"
+URL = AP_SERVER_URL + "ex_date/"
 
 st.title('🔍 유통기한 조회')
 
@@ -31,6 +35,8 @@ if days_7:
             df = df[['ls_cd', 'barcode', 'ls_dt', 'ex_dt', 'ls_ct']]
             df.rename(columns={'ls_cd':'입고코드', 'ls_dt':'입고일자', 'ex_dt':'유효기간', 'ls_ct':'수량'}, inplace=True)
             st.dataframe(df)
+    else:
+        st.write("현재 통신이 원활하지 않습니다. 관리자를 찾아주세요")
             
 elif days_14:
     today = datetime.today().strftime("%Y%m%D")
@@ -45,6 +51,9 @@ elif days_14:
             df = df[['ls_cd', 'barcode', 'ls_dt', 'ex_dt', 'ls_ct']]
             df.rename(columns={'ls_cd':'입고코드', 'ls_dt':'입고일자', 'ex_dt':'유효기간', 'ls_ct':'수량'}, inplace=True)
             st.dataframe(df)
+    else:
+        st.write("현재 통신이 원활하지 않습니다. 관리자를 찾아주세요")
+        
 elif days_21:
     today = datetime.today().strftime("%Y%m%D")
     ex_date = datetime.today() + timedelta(days=21)
@@ -58,3 +67,5 @@ elif days_21:
             df = df[['ls_cd', 'barcode', 'ls_dt', 'ex_dt', 'ls_ct']]
             df.rename(columns={'ls_cd':'입고코드', 'ls_dt':'입고일자', 'ex_dt':'유효기간', 'ls_ct':'수량'}, inplace=True)
             st.dataframe(df)
+    else:
+        st.write("현재 통신이 원활하지 않습니다. 관리자를 찾아주세요")

@@ -20,7 +20,7 @@ def get_secret(
             return default_value
         raise EnvironmentError(f"Set the {key} environment variable.")
 
-
+AP_SERVER_URL = get_secret("AP_SERVER_URL")
 DB_SERVER_URL = get_secret("DB_SERVER_URL")
 STOCK = get_secret("STOCK")
 INFERENCE_SERVER_URL = get_secret("INFERENCE_SERVER_URL")

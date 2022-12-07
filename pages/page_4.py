@@ -1,7 +1,12 @@
+import sys
 import requests
 import streamlit as st
+from pathlib import Path
 
-URL = "http://127.0.0.1:9000/item"
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
+from component.config import AP_SERVER_URL 
+URL = AP_SERVER_URL + "item/"
 
 st.title('🔍 상품 등록')
 

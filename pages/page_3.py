@@ -1,9 +1,13 @@
-from datetime import datetime
+import sys
 import streamlit as st
 import requests
 import pandas as pd
+from pathlib import Path
 
-URL = "http://127.0.0.1:9000/stock/"
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
+from component.config import AP_SERVER_URL 
+URL = AP_SERVER_URL + "stock/"
 
 st.title('🔍 입고 조회')
 
@@ -17,7 +21,7 @@ with col2:
     back_time = str(back_time).replace("-", "/")
 if st.button('입고 조회'):
     if front_time != None and back_time != None:
-        res = requests.get(url, params = {"period_front":front_time, "period_back":back_time})
+        res = requests.get(url=URL, params = {"period_front":front_time, "period_back":back_time})
     stock_json = res.json() # type = list
 
     if len(stock_json) == 0:
