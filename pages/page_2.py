@@ -14,7 +14,7 @@ qrcode = st.text_input('상품의 QR을 입력해주세요.', max_chars=21)
 barcode = qrcode[:14]
 ex_date = qrcode[13:17] + "/" + qrcode[17:19] + "/" + qrcode[19:]
 ld_cd = datetime.today().strftime("%Y%m%d%H%M%S%f")
-ld_dt = datetime.today().strftime("%Y/%m/%D")
+ld_dt = datetime.today().strftime("%Y/%m/%d")
 
 if len(qrcode) == 21:
     col1, col2 = st.columns(2)
