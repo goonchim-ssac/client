@@ -5,7 +5,7 @@ import pandas as pd
 
 URL = "http://127.0.0.1:9000/stock/"
 
-st.title('🔍 입고조회')
+st.title('🔍 입고 조회')
 
 col1, col2 = st.columns(2)
 
