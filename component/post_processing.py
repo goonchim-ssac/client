@@ -41,25 +41,25 @@ def check_date(year, month, day):
 
 
 # OCR병합, 숫자만 남김
-def change_num(ocr_list):
-    ocr_word = ''.join(ocr_list)
+def change_num(ocr_result):
+    ocr_word = ''.join(ocr_result)
     date_n = re.sub(r'[^0-9]', '', ocr_word)
 
     return date_n
 
 
 # 유통기한(yyyy/mm/dd) 형식으로 변경
-def get_expdate(ocr_list): #date_n
-    date_n = change_num(ocr_list)
+def formatting(ocr_result): #date_n
+    date_n = change_num(ocr_result)
     size = len(date_n)
-    exdate = []
+    date_format = []
     year = any
     month = any
     day = any
     
     # 해외 주류
     if size == 8 and check_date(date_n[4:8], date_n[2:4], date_n[0:2]):
-        exdate.append(f'{date_n[4:8]}/{date_n[2:4]}/{date_n[0:2]}')
+        date_format.append(f'{date_n[4:8]}/{date_n[2:4]}/{date_n[0:2]}')
 
     # 4자리 : 유제품류 mm dd
     elif size == 4:
@@ -69,9 +69,9 @@ def get_expdate(ocr_list): #date_n
         today_m = str(date.today().month)
 
         if today_m == '12' and month == '01':
-            exdate.append(f'{today.year + 1}/{month}/{day}')
+            date_format.append(f'{today.year + 1}/{month}/{day}')
         else:
-            exdate.append(f'{today.year}/{month}/{day}')
+            date_format.append(f'{today.year}/{month}/{day}')
 
     # 6자리 : yy mm dd / mm dd yy
     elif size == 6:
@@ -88,7 +88,7 @@ def get_expdate(ocr_list): #date_n
         result = check_date(year, month, day)
         
         if result == 1:
-            exdate.append(f'20{year}/{month}/{day}') 
+            date_format.append(f'20{year}/{month}/{day}') 
                 
     # 8자리 : (yy)yy mm dd / mm dd (yy)yy
     elif size == 8:
@@ -105,13 +105,26 @@ def get_expdate(ocr_list): #date_n
         result = check_date(year, month, day)
         
         if result == 1:
-            exdate.append(f'20{year}/{month}/{day}')
+            date_format.append(f'20{year}/{month}/{day}')
                 
     # 그외 : 정보부족/전처리안됨
     else:
-        exdate.append("")
+        date_format.append("")
 
-    return exdate
+    return date_format
+
+
+def get_expdate(ocr_list):
+    
+    if len(ocr_list) > 1:
+        result = []
+        for li in ocr_list: # 각 박스마다 ocr 결과를 날짜 형식으로 추출
+            result.append(formatting(li))
+        return max(result) # 결과 중 가장 큰 것을 유통기한으로 판단
+
+    else:
+        result = formatting(*ocr_list)
+        return result # 박스가 하나만 있다면 그 결과를 유통기한으로 판단
 
 
 if __name__ == "__main__":
