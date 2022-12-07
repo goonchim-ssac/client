@@ -1,2 +1,6 @@
-__pycache__/
+__pycache__
+component/__pycache__
+
 component/secrets.json
+
+temp_images

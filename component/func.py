@@ -14,8 +14,9 @@ class ImageFile():
     def make_filepath(self):
         self.time = str(datetime.now(timezone("Asia/Seoul")))
         self.time = re.sub(r'[.|:]', '', self.time) # 파일명에 사용할 수 없는 문자열 제거
+        directory = 'temp_images/'
         
-        return f'{self.time}.jpg'
+        return directory + f'{self.time}.jpg'
 
 
     def image_to_buffer(self, img): # img에 captured_image
