@@ -214,6 +214,7 @@ if len(barcode) == 13:
                 ex1, co2 = st.columns(2)
                 with ex1 :
                     exp_date = st.date_input('유통기한을 입력해주세요.')
+                    exp_date = str(exp_date).replace('-', '/')
                 with co2 :
                     count = st.number_input('수량을 입력해주세요', 0, 1000)
                     
