@@ -7,7 +7,8 @@ from datetime import datetime, timedelta
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 from component.config import AP_SERVER_URL 
 
-URL = AP_SERVER_URL + "ex_date/"
+# URL = AP_SERVER_URL + "ex_date/"
+URL = "http://127.0.0.1:8000/ex_date/"
 
 st.title('🔍 유통기한 조회')
 
@@ -23,7 +24,7 @@ with col3:
     days_21 = st.button("21일")
     
 if days_7:
-    today = datetime.today().strftime("%Y%m%D")
+    today = datetime.today().strftime("%Y/%m/%d")
     ex_date = datetime.today() + timedelta(days=7)
     ex_date = ex_date.strftime("%Y/%m/%d")
     res = requests.get(url=URL, params={"today":today, "ex_date":ex_date})
@@ -39,7 +40,7 @@ if days_7:
         st.write("현재 통신이 원활하지 않습니다. 관리자를 찾아주세요")
             
 elif days_14:
-    today = datetime.today().strftime("%Y%m%D")
+    today = datetime.today().strftime("%Y/%m/%d")
     ex_date = datetime.today() + timedelta(days=14)
     ex_date = ex_date.strftime("%Y/%m/%d")
     res = requests.get(url=URL, params={"today":today, "ex_date":ex_date})
@@ -55,7 +56,7 @@ elif days_14:
         st.write("현재 통신이 원활하지 않습니다. 관리자를 찾아주세요")
         
 elif days_21:
-    today = datetime.today().strftime("%Y%m%D")
+    today = datetime.today().strftime("%Y/%m/%d")
     ex_date = datetime.today() + timedelta(days=21)
     ex_date = ex_date.strftime("%Y/%m/%d")
     res = requests.get(url=URL, params={"today":today, "ex_date":ex_date})
