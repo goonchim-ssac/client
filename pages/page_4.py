@@ -1,7 +1,7 @@
 import requests
 import streamlit as st
 
-URL = "http://52.78.154.186:9000/item"
+URL = "http://127.0.0.1:9000/item"
 
 st.header("상품 등록")
 
