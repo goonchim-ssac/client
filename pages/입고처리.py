@@ -14,8 +14,6 @@ from component.config import DB_SERVER_URL, INFERENCE_SERVER_URL, STOCK
 from component.func import ImageFile
 from component.post_processing import get_expdate
 
-
-
 # 기본 설정
 if 'last' not in st.session_state:
     st.session_state.last = None
@@ -146,7 +144,7 @@ if len(barcode) == 13:
         captured_image = webcam('상품의 유통기한을 인식해주세요')
         
         if captured_image is None:
-            st.write('정면으로 인식되었다면 <Take Photo> 를 눌러주세요')
+            st.write('정면으로 인식되었다면 <Capture frame> 을 눌러주세요')
             
         else:
             buffered_stream = image_file.image_to_buffer(captured_image)
@@ -186,8 +184,8 @@ if len(barcode) == 13:
                 if st.button('QR 생성'):
                     exp_date_num = re.sub(r'[^0-9]', '', str(exp_date))   
                     img = qrcode.make(f"{barcode}{exp_date_num}")
-                    img.save(f"./pages/qr_code/{barcode}{exp_date_num}.jpg")
-                    st.image(f"./pages/qr_code/{barcode}{exp_date_num}.jpg")
+                    img.save(f"./qr_code/{barcode}{exp_date_num}.jpg")
+                    st.image(f"./qr_code/{barcode}{exp_date_num}.jpg")
 
 
                 if st.button('등록'):

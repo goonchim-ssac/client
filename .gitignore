@@ -6,4 +6,4 @@ component/secrets.json
 
 # 실행하면서 저장되는 이미지들
 temp_images
-pages/qr_code
+qr_code
