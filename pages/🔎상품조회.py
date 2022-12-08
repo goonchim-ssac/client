@@ -25,7 +25,7 @@ if st.button('조회'):
             df.rename(columns={'item_cd':'바코드', 'item_nm':'상품명', 'item_cat_nm':'상품 분류', 'item_maker':'제조사'}, inplace=True)
             st.dataframe(df)
     else:
-        res = requests.get(url=URL, json={"item_cd" : product})
+        res = requests.get(url=URL, params={"barcode" : product})
         df = pd.DataFrame.from_records(res.json())
         df = df[['item_cd', 'item_nm', 'item_cat_nm', 'item_maker']]
         df.rename(columns={'item_cd':'바코드', 'item_nm':'상품명', 'item_cat_nm':'상품 분류', 'item_maker':'제조사'}, inplace=True)
