@@ -8,7 +8,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from component.config import AP_SERVER_URL 
 URL = AP_SERVER_URL + "item/"
 
-st.title('🔍 상품 등록')
+st.title('📝 상품 등록')
 
 item_cd = st.text_input("바코드")
 
